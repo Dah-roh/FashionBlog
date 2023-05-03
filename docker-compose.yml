@@ -1,0 +1,40 @@
+version: "3"
+services:
+#  first service is postgres
+  database:
+    image: postgres
+    restart: always
+    #    persist data created in the docker container
+    volumes:
+      - data:/var/lib/postgres
+    environment:
+      POSTGRES_PASSWORD: password
+
+  app1:
+    build: ./FashionAPI14
+    restart: always
+    environment:
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/postgres
+    depends_on:
+      - database
+    volumes:
+      - .:/code
+    ports:
+      - "8080:8080"
+  app2:
+    build: ./Oauth2Service
+    restart: always
+    environment:
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/postgres
+    depends_on:
+      - database
+    volumes:
+      - .:/code
+    ports:
+      - "8081:8081"
+volumes:
+      data:
